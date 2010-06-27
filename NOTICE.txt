@@ -1,0 +1,4 @@
+Stock Price Viewer
+Copyright 2010 Kwok Ho Yin
+
+The application icon is the work of IconEden.com. It can be downloaded from http://www.iconeden.com/icon/category/free.
