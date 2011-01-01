@@ -31,31 +31,31 @@ import android.widget.TextView;
 public class StockPriceListAdapter extends BaseAdapter {
 	// This variable is used for debug log (LogCat)
 	private static final String TAG = "SPV:StockPriceListAdapter";
-	
+
 	private LayoutInflater mInflater;
 	private Cursor	 mPriceData = null;
 	private Bitmap[] mIcon;
 
 	public StockPriceListAdapter(Context context, Cursor price_data) {
 		mInflater = LayoutInflater.from(context);
-		
+
 		mPriceData = price_data;
-		
+
 		mIcon = new Bitmap[3];
-		
+
 		mIcon[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.up);
 		mIcon[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.down);
 		mIcon[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.same);
-		
+
 		// refresh data
 		mPriceData.requery();
 	}
-	
+
 	@Override
 	public void finalize() {
 		freeResources();
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mPriceData.getCount();
@@ -76,27 +76,27 @@ public class StockPriceListAdapter extends BaseAdapter {
 		ViewHolder	holder;
 		String		szSymbol, szName, szPrice, szChange;
 		double		change;
-		
+
 		try {
 			if(convertView == null) {
 				// uses stocklistitem.xml to display each currency selection
 				convertView = mInflater.inflate(R.layout.stocklistitem, null);
 				// then create a holder for this view for faster access
 				holder = new ViewHolder();
-				
+
 				holder.icon = (ImageView) convertView.findViewById(R.id.list_change_icon);
 				holder.name = (TextView) convertView.findViewById(R.id.list_name_text);
 				holder.price = (TextView) convertView.findViewById(R.id.list_price_text);
 				holder.change = (TextView) convertView.findViewById(R.id.list_change_text);
 				holder.symbol = (TextView) convertView.findViewById(R.id.list_symbol_text);
-				
+
 				// store this holder in the list
 				convertView.setTag(holder);
 			} else {
 				// load the holder of this view
 				holder = (ViewHolder) convertView.getTag();
 			}
-			
+
 			if(mPriceData.moveToPosition(position)) {
 				szSymbol = mPriceData.getString(StockData_DB.COL_SD_SYMBOL_IDX);
 				szName = mPriceData.getString(StockData_DB.COL_SD_NAME_IDX);
@@ -110,7 +110,7 @@ public class StockPriceListAdapter extends BaseAdapter {
 				change = 0;
 				szChange = "0";
 			}
-			
+
 			if(change > 0) {
 				holder.icon.setImageBitmap(mIcon[0]);
 			} else if(change < 0) {
@@ -118,7 +118,7 @@ public class StockPriceListAdapter extends BaseAdapter {
 			} else {
 				holder.icon.setImageBitmap(mIcon[2]);
 			}
-			
+
 			holder.symbol.setText(szSymbol);
 			holder.name.setText(szName);
 			holder.price.setText(szPrice);
@@ -126,10 +126,10 @@ public class StockPriceListAdapter extends BaseAdapter {
 		} catch (Exception e) {
 			Log.e(TAG, "getView:" + e.toString());
 		}
-		
+
 		return convertView;
 	}
-	
+
 	public void freeResources() {
 		if(mPriceData != null) {
 			Log.d(TAG, "Close SQL cursor...");
@@ -137,22 +137,36 @@ public class StockPriceListAdapter extends BaseAdapter {
 			mPriceData = null;
 		}
 	}
-	
+
 	public String getSymbol(int position) {
 		String	result = "";
-		
+
+		// get symbol from database by the position
 		if(mPriceData.moveToPosition(position)) {
+			// symbol in the first column
 			result = mPriceData.getString(0);
 		}
-		
+
 		return result;
 	}
-	
+
+	public String getName(int position) {
+		String	result = "";
+
+		// get symbol from database by the position
+		if(mPriceData.moveToPosition(position)) {
+			// name in the second column
+			result = mPriceData.getString(1);
+		}
+
+		return result;
+	}
+
 	public void UpdateInternalData() {
 		// refresh data
 		mPriceData.requery();
 	}
-	
+
 	/* class ViewHolder */
 	private class ViewHolder {
 		TextView	symbol;

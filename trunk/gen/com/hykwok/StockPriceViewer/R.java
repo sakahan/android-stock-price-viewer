@@ -17,6 +17,8 @@ public final class R {
     public static final class color {
         public static final int about_title_bg=0x7f060000;
         public static final int about_title_text=0x7f060001;
+        public static final int detail_symbol_bg_color=0x7f060003;
+        public static final int detail_symbol_text_color=0x7f060004;
         public static final int widget_text_color=0x7f060002;
     }
     public static final class drawable {
@@ -31,29 +33,86 @@ public final class R {
         public static final int About_Dialog_Text=0x7f080003;
         public static final int About_Dialog_Title=0x7f080001;
         public static final int ButtonAdd=0x7f080007;
+        public static final int Button_BuySell=0x7f080042;
+        public static final int Button_Cal=0x7f08001e;
         public static final int EditTextSymbol=0x7f080005;
-        public static final int Frame_Main=0x7f080013;
+        public static final int EditText_BuyPrice=0x7f080011;
+        public static final int EditText_LotSize=0x7f08001d;
+        public static final int EditText_OtherPrice=0x7f08001a;
+        public static final int EditText_SellPrice=0x7f080014;
+        public static final int EditText_TotalShares=0x7f080017;
+        public static final int Frame_Main=0x7f08004a;
         public static final int LinearLayout01=0x7f080000;
+        public static final int LinearLayout_Line1=0x7f08000d;
+        public static final int LinearLayout_Line10=0x7f080039;
+        public static final int LinearLayout_Line11=0x7f08003c;
+        public static final int LinearLayout_Line12=0x7f08003f;
+        public static final int LinearLayout_Line2=0x7f08000f;
+        public static final int LinearLayout_Line3=0x7f080012;
+        public static final int LinearLayout_Line4=0x7f080015;
+        public static final int LinearLayout_Line5=0x7f080018;
+        public static final int LinearLayout_Line6=0x7f08001b;
+        public static final int LinearLayout_Line7=0x7f08002c;
+        public static final int LinearLayout_Line8=0x7f08002f;
+        public static final int LinearLayout_Line9=0x7f080034;
         public static final int ListViewStock=0x7f08000b;
+        public static final int ScrollView01=0x7f08000c;
         public static final int SpinnerRegion=0x7f080006;
         public static final int TextView03=0x7f080009;
         public static final int TextViewLastUpdate=0x7f08000a;
-        public static final int TextView_Message=0x7f080014;
+        public static final int TextView_200DMovingAvg=0x7f08003e;
+        public static final int TextView_50DMovingAvg=0x7f08003b;
+        public static final int TextView_52WHigh=0x7f080038;
+        public static final int TextView_52WLow=0x7f080036;
+        public static final int TextView_52WSperater=0x7f080037;
+        public static final int TextView_CalResult=0x7f08001f;
+        public static final int TextView_Change=0x7f080026;
+        public static final int TextView_ChangePercent=0x7f080027;
+        public static final int TextView_DayHigh=0x7f080033;
+        public static final int TextView_DayLow=0x7f080031;
+        public static final int TextView_DaySperater=0x7f080032;
+        public static final int TextView_LastTradeDate=0x7f080021;
+        public static final int TextView_LastTradePrice=0x7f080024;
+        public static final int TextView_LastTradeTime=0x7f080022;
+        public static final int TextView_Message=0x7f08004b;
+        public static final int TextView_Name2=0x7f080010;
+        public static final int TextView_Name3=0x7f080013;
+        public static final int TextView_Name4=0x7f080016;
+        public static final int TextView_Name5=0x7f080019;
+        public static final int TextView_Name6=0x7f08001c;
+        public static final int TextView_Open=0x7f08002e;
+        public static final int TextView_PE=0x7f080041;
+        public static final int TextView_PrevClose=0x7f08002b;
+        public static final int TextView_SymbolName=0x7f08000e;
+        public static final int TextView_Volume=0x7f080029;
+        public static final int TextView_detailtitle02=0x7f080020;
+        public static final int TextView_detailtitle03=0x7f080023;
+        public static final int TextView_detailtitle04=0x7f080025;
+        public static final int TextView_detailtitle05=0x7f080028;
+        public static final int TextView_detailtitle06=0x7f08002a;
+        public static final int TextView_detailtitle07=0x7f08002d;
+        public static final int TextView_detailtitle08=0x7f080030;
+        public static final int TextView_detailtitle09=0x7f080035;
+        public static final int TextView_detailtitle10=0x7f08003a;
+        public static final int TextView_detailtitle11=0x7f08003d;
+        public static final int TextView_detailtitle12=0x7f080040;
         public static final int layoutA=0x7f080004;
-        public static final int list_change_icon=0x7f080011;
-        public static final int list_change_text=0x7f080010;
-        public static final int list_item=0x7f08000c;
-        public static final int list_item_line1=0x7f08000d;
-        public static final int list_name_text=0x7f080012;
-        public static final int list_price_text=0x7f08000f;
-        public static final int list_symbol_text=0x7f08000e;
+        public static final int list_change_icon=0x7f080048;
+        public static final int list_change_text=0x7f080047;
+        public static final int list_item=0x7f080043;
+        public static final int list_item_line1=0x7f080044;
+        public static final int list_name_text=0x7f080049;
+        public static final int list_price_text=0x7f080046;
+        public static final int list_symbol_text=0x7f080045;
         public static final int main_layout=0x7f080008;
     }
     public static final class layout {
         public static final int about_dialog=0x7f030000;
         public static final int main=0x7f030001;
-        public static final int stocklistitem=0x7f030002;
-        public static final int widget_main=0x7f030003;
+        public static final int stockbuysell_hk=0x7f030002;
+        public static final int stockdetails=0x7f030003;
+        public static final int stocklistitem=0x7f030004;
+        public static final int widget_main=0x7f030005;
     }
     public static final class string {
         public static final int Dialog_Delete_Symbol_Cancel=0x7f070004;
@@ -65,6 +124,26 @@ public final class R {
         public static final int Toast_Add_Symbol_Ok=0x7f070008;
         public static final int app_name=0x7f070000;
         public static final int btnAdd=0x7f070001;
+        public static final int cal_btn_cal=0x7f070022;
+        public static final int cal_buyprice=0x7f07001d;
+        public static final int cal_lotsize=0x7f070021;
+        public static final int cal_others=0x7f070020;
+        public static final int cal_sellprice=0x7f07001e;
+        public static final int cal_totalshares=0x7f07001f;
+        public static final int detail_200d_avg=0x7f070019;
+        public static final int detail_50d_avg=0x7f070018;
+        public static final int detail_52w_hl=0x7f070017;
+        public static final int detail_buysell=0x7f07001c;
+        public static final int detail_change=0x7f070012;
+        public static final int detail_day_hl=0x7f070016;
+        public static final int detail_lasttrade_datetime=0x7f070010;
+        public static final int detail_lasttrade_price=0x7f070011;
+        public static final int detail_open=0x7f070015;
+        public static final int detail_pe_ratio=0x7f07001a;
+        public static final int detail_prevclose=0x7f070014;
+        public static final int detail_sperater=0x7f07001b;
+        public static final int detail_unknown_symbol=0x7f07000f;
+        public static final int detail_volume=0x7f070013;
         public static final int preferences_name=0x7f07000a;
         public static final int szLastUpdate=0x7f070002;
         public static final int szMenu_About=0x7f07000b;
@@ -73,7 +152,8 @@ public final class R {
         public static final int widget_no_data=0x7f07000e;
     }
     public static final class xml {
-        public static final int prog_preference=0x7f040000;
-        public static final int stockprice_widget_provider=0x7f040001;
+        public static final int buysell_preference_hk=0x7f040000;
+        public static final int prog_preference=0x7f040001;
+        public static final int stockprice_widget_provider=0x7f040002;
     }
 }

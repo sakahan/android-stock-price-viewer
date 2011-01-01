@@ -24,15 +24,15 @@ android:layout_height="fill_parent"
 android:id="@+id/Frame_Main"
 >
 
-<TextView 
+<TextView
 android:text=""
-android:gravity="center" 
-android:id="@+id/TextView_Message" 
+android:gravity="center"
+android:id="@+id/TextView_Message"
 android:layout_width="282dip"
 android:layout_height="54dip"
 android:background="@drawable/widget_bg"
 android:textColor="@color/widget_text_color"
 >
 </TextView>
- 
+
 </LinearLayout>
