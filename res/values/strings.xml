@@ -11,6 +11,7 @@
 
    	Unless required by applicable law or agreed to in writing, software
    	distributed under the License is distributed on an "AS IS" BASIS,
+   
    	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    	See the License for the specific language governing permissions and
    	limitations under the License.
@@ -32,4 +33,26 @@
 	<string name="szMenu_Preference">Setting</string>
 	<string name="widget_name">Stock Price Widget</string>
 	<string name="widget_no_data">No data will be displayed</string>
+	<string name="detail_unknown_symbol">XXXX (XXXX)</string>
+	<string name="detail_lasttrade_datetime">Last trade:</string>
+	<string name="detail_lasttrade_price">Price:</string>
+	<string name="detail_change">Change:</string>
+	<string name="detail_volume">Volume:</string>
+	<string name="detail_prevclose">Previous Close:</string>
+	<string name="detail_open">Open:</string>
+	<string name="detail_day_hl">Day range:</string>
+	<string name="detail_52w_hl">52 week range:</string>
+	<string name="detail_50d_avg">50 day moving average:</string>
+	<string name="detail_200d_avg">200 day moving average:</string>
+	<string name="detail_pe_ratio">P/E Ratio:</string>
+	<string name="detail_sperater">-</string>
+	<string name="detail_buysell">Buy/Sell Calculation</string>
+		
+	<string name="cal_buyprice">Price (Buy):</string>
+	<string name="cal_sellprice">Price (Sell):</string>
+	<string name="cal_totalshares">No. of shares:</string>
+	<string name="cal_others">Other charges:</string>
+	<string name="cal_lotsize">Lot Size:</string>
+	<string name="cal_btn_cal">Calculate</string>
+		
 </resources>

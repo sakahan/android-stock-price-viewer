@@ -20,4 +20,6 @@
 <color name="about_title_bg">#6699FF</color>
 <color name="about_title_text">#FFFFFF</color>
 <color name="widget_text_color">#000000</color>
+<color name="detail_symbol_bg_color">#6699FF</color>
+<color name="detail_symbol_text_color">#FFFFFF</color>
 </resources>

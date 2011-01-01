@@ -25,32 +25,32 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class StockDataConnection {
-	// This variable is used for debug log (LogCat) 
+	// This variable is used for debug log (LogCat)
 	private static final String TAG = "SPV:InternetConnection";
 	private TelephonyManager	mPhoneMgr;
 	private WifiManager			mWIFIMgr;
-	
+
 	// flags
 	private boolean bAbleNetworkRoaming = false;
-	
+
 	public StockDataConnection(Context context) {
 		// get telephony service
 		mPhoneMgr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
 		// get WIFI service
 		mWIFIMgr = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
 	}
-	
+
 	public void EnableNetworkRoaming(boolean flag) {
 		bAbleNetworkRoaming = flag;
 	}
-	
+
 	public boolean IsWIFIAvailabe() {
 		try {
 			if(mWIFIMgr.isWifiEnabled()) {
 				if(mWIFIMgr.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
-					
+
 					WifiInfo info = mWIFIMgr.getConnectionInfo();
-					
+
 					if(info.getNetworkId() != -1) {
 						return true;
 					} else {
@@ -65,57 +65,57 @@ public class StockDataConnection {
 		} catch (Exception e) {
 			Log.e(TAG, "IsWIFIAvailabe:" + e.toString());
 		}
-		
+
 		return false;
 	}
-	
+
 	public boolean IsPhoneAvaiable() {
 		int		result;
-		
+
 		result = mPhoneMgr.getDataActivity();
 		Log.d(TAG, "Phone data activity = " + Integer.toString(result));
 		//if(result != TelephonyManager.DATA_ACTIVITY_INOUT ) {
 		//	Log.w(TAG, "Phone data activity is not IN and OUT");
 		//	return false;
 		//}
-		
+
 		result = mPhoneMgr.getDataState();
-		Log.d(TAG, "Phone data state = " + Integer.toString(result));		
+		Log.d(TAG, "Phone data state = " + Integer.toString(result));
 		if(result != TelephonyManager.DATA_CONNECTED) {
 			Log.w(TAG, "IP traffic might not be available");
 			return false;
 		}
-		
+
 		result = mPhoneMgr.getCallState();
-		Log.d(TAG, "Phone call state = " + Integer.toString(result));		
+		Log.d(TAG, "Phone call state = " + Integer.toString(result));
 		if(result != TelephonyManager.CALL_STATE_IDLE) {
 			Log.w(TAG, "Phone call state is not idle");
 			return false;
 		}
-		
+
 		if(mPhoneMgr.isNetworkRoaming()) {
 			if(bAbleNetworkRoaming == false) {
 				Log.w(TAG, "Do not connect to Internet during network roaming");
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean TestConnection(String szURL) {
 		try {
 			URL	url = new URL(szURL);
-			
+
 			if(IsPhoneAvaiable() == false) {
 				if(IsWIFIAvailabe() == false) {
 					return false;
-				}				
+				}
 			}
-			
+
 			InputStream in = url.openStream();
 			in.close();
-			
+
 			return true;
 		} catch (Exception e) {
 			Log.e(TAG, "CreateConnection: " + e.toString());

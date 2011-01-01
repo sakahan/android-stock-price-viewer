@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+	Copyright 2010 Kwok Ho Yin
+
+   	Licensed under the Apache License, Version 2.0 (the "License");
+   	you may not use this file except in compliance with the License.
+   	You may obtain a copy of the License at
+
+    	http://www.apache.org/licenses/LICENSE-2.0
+
+   	Unless required by applicable law or agreed to in writing, software
+   	distributed under the License is distributed on an "AS IS" BASIS,
+   	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   	See the License for the specific language governing permissions and
+   	limitations under the License.
+-->
+
+<ScrollView
+xmlns:android="http://schemas.android.com/apk/res/android" 
+android:id="@+id/ScrollView01" 
+android:layout_width="fill_parent" 
+android:layout_height="fill_parent"
+>
+
+<LinearLayout
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical"
+>
+<!-- Line 1 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line1"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_SymbolName"
+android:layout_height="wrap_content"
+android:layout_width="fill_parent"
+android:text="@string/detail_unknown_symbol"
+android:background="@color/detail_symbol_bg_color"
+android:textColor="@color/detail_symbol_text_color"
+android:layout_marginRight="5dip"
+>
+</TextView>
+</LinearLayout>
+<!-- Line 2 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line2"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_Name2"
+android:layout_height="wrap_content"
+android:layout_width="170dip"
+android:text="@string/cal_buyprice"
+>
+</TextView>
+<EditText 
+android:text="" 
+android:id="@+id/EditText_BuyPrice" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</EditText>
+</LinearLayout>
+<!-- Line 3 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line3"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_Name3"
+android:layout_height="wrap_content"
+android:layout_width="170dip"
+android:text="@string/cal_sellprice"
+>
+</TextView>
+<EditText 
+android:text="" 
+android:id="@+id/EditText_SellPrice" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</EditText>
+</LinearLayout>
+<!-- Line 4 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line4"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_Name4"
+android:layout_height="wrap_content"
+android:layout_width="170dip"
+android:text="@string/cal_totalshares"
+>
+</TextView>
+<EditText 
+android:text="" 
+android:id="@+id/EditText_TotalShares" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</EditText>
+</LinearLayout>
+<!-- Line 5 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line5"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_Name5"
+android:layout_height="wrap_content"
+android:layout_width="170dip"
+android:text="@string/cal_others"
+>
+</TextView>
+<EditText 
+android:text="" 
+android:id="@+id/EditText_OtherPrice" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</EditText>
+</LinearLayout>
+<!-- Line 6 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line6"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+>
+<TextView
+android:id="@+id/TextView_Name6"
+android:layout_height="wrap_content"
+android:layout_width="170dip"
+android:text="@string/cal_lotsize"
+>
+</TextView>
+<EditText 
+android:text="" 
+android:id="@+id/EditText_LotSize" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</EditText>
+</LinearLayout>
+
+<Button 
+android:text="@string/cal_btn_cal" 
+android:id="@+id/Button_Cal" 
+android:layout_width="fill_parent" 
+android:layout_height="wrap_content"
+android:layout_marginRight="5dip"
+>
+</Button>
+
+<TextView 
+android:text="" 
+android:id="@+id/TextView_CalResult" 
+android:layout_width="fill_parent" 
+android:layout_height="fill_parent"
+android:autoLink="web"
+android:scrollbars="vertical"
+android:layout_marginRight="5dip"
+>
+</TextView>
+
+</LinearLayout>
+
+</ScrollView>

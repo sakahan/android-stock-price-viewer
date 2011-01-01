@@ -32,7 +32,11 @@
         <service android:name=".StockDataService">
 		</service>
 		
+		<activity android:name=".ActivityStockDetail"></activity>
+		<activity android:name=".ActivityStockBuySell"></activity>
+		
 		<activity android:name="StockPricePreferences" android:label="@string/preferences_name"></activity>
+		<activity android:name="StockBuySellPreferences" android:label="@string/preferences_name"></activity>
 		
 		<!-- Broadcast Receiver that will process AppWidget updates -->
 		<receiver android:name=".StockPriceWidget" android:label="@string/widget_name">
