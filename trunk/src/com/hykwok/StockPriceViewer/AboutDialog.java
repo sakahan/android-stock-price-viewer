@@ -30,7 +30,7 @@ public class AboutDialog extends Dialog implements OnClickListener {
 	// about messages
 	private static final String str_about[] = {
 			"<b>Stock Price Viewer</b>",
-			"Copyright 2010 Kwok Ho Yin",
+			"Copyright 2010 - 2011 Kwok Ho Yin",
 			"Licensed under the Apache License, Version 2.0",
 			"",
 			"Credits:",

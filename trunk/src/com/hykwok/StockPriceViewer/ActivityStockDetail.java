@@ -160,7 +160,7 @@ public class ActivityStockDetail extends Activity {
         	m_stockdata.previous_close = savedInstanceState.getDouble(KEY_BK_PREV_CLOSE);
         	m_stockdata.open = savedInstanceState.getDouble(KEY_BK_OPEN);
         	m_stockdata.volume = savedInstanceState.getLong(KEY_BK_VOLUME);
-        	m_stockdata.p_e_ratio = savedInstanceState.getDouble(KEY_BK_PE);
+        	m_stockdata.p_e_ratio = savedInstanceState.getString(KEY_BK_PE);
         }
 
         Log.d(TAG, "onCreate <<<<<");
@@ -249,7 +249,7 @@ public class ActivityStockDetail extends Activity {
 	    	outState.putString(KEY_BK_DATE, m_stockdata.last_trade_date);
 	    	outState.putString(KEY_BK_TIME, m_stockdata.last_trade_time);
 	    	outState.putDouble(KEY_BK_PRICE, m_stockdata.last_trade_price);
-	    	outState.putDouble(KEY_BK_PE, m_stockdata.p_e_ratio);
+	    	outState.putString(KEY_BK_PE, m_stockdata.p_e_ratio);
     	}
 
     	Log.d(TAG, "onSaveInstanceState <<<<<");
@@ -289,7 +289,7 @@ public class ActivityStockDetail extends Activity {
 			m_textview_52w_low.setText(Double.toString(m_stockdata.week_52_low));
 			m_textview_50d_mov_avg.setText(Double.toString(m_stockdata.average_50_day_moving));
 			m_textview_200d_mov_avg.setText(Double.toString(m_stockdata.average_200_day_moving));
-			m_textview_pe.setText(Double.toString(m_stockdata.p_e_ratio));
+			m_textview_pe.setText(m_stockdata.p_e_ratio);
 		} else {
 			// clear previous data firstly
 			m_textview_date.setText("????");
