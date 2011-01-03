@@ -125,7 +125,7 @@ public class StockDataProvider_Yahoo {
 		        		// 200 day moving average
 		        		s_data.average_200_day_moving = Double.parseDouble(decodestring[14]);
 		        		// P/E ratio
-		        		s_data.p_e_ratio = Double.parseDouble(decodestring[15]);
+		        		s_data.p_e_ratio = decodestring[15];
 		        		// name
 		        		s_data.name = "";
 		        		for(int i=16; i<decodestring.length; i++) {

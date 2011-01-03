@@ -32,6 +32,6 @@ public class StockDetailData {
 	public double week_52_high;
 	public double average_50_day_moving;
 	public double average_200_day_moving;
-	public double p_e_ratio;
+	public String p_e_ratio;
 	public String name;
 }
