@@ -103,7 +103,7 @@ android:orientation="horizontal"
 android:id="@+id/TextView_Name4"
 android:layout_height="wrap_content"
 android:layout_width="170dip"
-android:text="@string/cal_totalshares"
+android:text="@string/cal_totalstocks"
 >
 </TextView>
 <EditText 

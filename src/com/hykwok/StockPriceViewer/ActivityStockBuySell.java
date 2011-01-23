@@ -73,7 +73,7 @@ public class ActivityStockBuySell extends Activity {
 	private double m_buy_price = 0;
 	private double m_sell_price = 0;
 	private double m_other_charges = 0;
-	private int m_total_shares = 0;
+	private int m_total_stocks = 0;
 	private int m_lot_size = 1;
 	private String m_result_txt = "";
 	
@@ -151,7 +151,7 @@ public class ActivityStockBuySell extends Activity {
         	m_name = savedInstanceState.getString(KEY_BK_NAME);
         	m_buy_price = savedInstanceState.getDouble(KEY_BK_BUY);
         	m_sell_price = savedInstanceState.getDouble(KEY_BK_SELL);
-        	m_total_shares = savedInstanceState.getInt(KEY_BK_VOL);
+        	m_total_stocks = savedInstanceState.getInt(KEY_BK_VOL);
         	m_other_charges = savedInstanceState.getDouble(KEY_BK_OTHERS);
         	m_lot_size = savedInstanceState.getInt(KEY_BK_LOTSIZE);
         	m_result_txt = savedInstanceState.getString(KEY_BK_RESULT);
@@ -193,7 +193,7 @@ public class ActivityStockBuySell extends Activity {
     		m_name = bundle.getString(KEY_CAL_NAME);
     		m_buy_price = bundle.getDouble(KEY_CAL_BUY);
         	m_sell_price = bundle.getDouble(KEY_CAL_SELL);
-    		m_total_shares = 0;
+    		m_total_stocks = 0;
         	m_other_charges = 0;
         	m_lot_size = 1;
         	m_result_txt = "";
@@ -239,7 +239,7 @@ public class ActivityStockBuySell extends Activity {
     	outState.putString(KEY_BK_NAME, m_name);
     	outState.putDouble(KEY_BK_BUY, m_buy_price);
     	outState.putDouble(KEY_BK_SELL, m_sell_price);
-    	outState.putInt(KEY_BK_VOL, m_total_shares);
+    	outState.putInt(KEY_BK_VOL, m_total_stocks);
     	outState.putDouble(KEY_BK_OTHERS, m_other_charges);
     	outState.putInt(KEY_BK_LOTSIZE, m_lot_size);
     	outState.putString(KEY_BK_RESULT, m_result_txt);
@@ -284,15 +284,15 @@ public class ActivityStockBuySell extends Activity {
 				m_sell_price = Double.parseDouble(edit_sellprice.getText().toString());
 				m_other_charges = Double.parseDouble(edit_others.getText().toString());
 				m_lot_size = Integer.parseInt(edit_lotsize.getText().toString());
-				m_total_shares = Integer.parseInt(edit_volume.getText().toString());
+				m_total_stocks = Integer.parseInt(edit_volume.getText().toString());
 				
-				double total_buy_price = m_buy_price * m_total_shares;
-				double total_sell_price = m_sell_price * m_total_shares;
+				double total_buy_price = m_buy_price * m_total_stocks;
+				double total_sell_price = m_sell_price * m_total_stocks;
 				
 				double buy_tax = cal_stamp_duty(total_buy_price);
 				double buy_fee = cal_trading_fee(total_buy_price);
 				buy_fee += cal_brokerage_fee(total_buy_price);
-				double charge = cal_deposit_charge(m_total_shares, m_lot_size);
+				double charge = cal_deposit_charge(m_total_stocks, m_lot_size);
 				
 				double sell_tax = cal_stamp_duty(total_sell_price);
 				double sell_fee = cal_trading_fee(total_sell_price);
@@ -304,7 +304,7 @@ public class ActivityStockBuySell extends Activity {
 				// prepare results
 				m_result_txt = "";
 				m_result_txt += "Buy:<br />";
-				m_result_txt += "Shares: ";
+				m_result_txt += "Stock: ";
 				m_result_txt += Double.toString(total_buy_price);
 				m_result_txt += "<br />";
 				m_result_txt += "Fee: ";
@@ -320,7 +320,7 @@ public class ActivityStockBuySell extends Activity {
 				m_result_txt += Double.toString(total_buy);
 				m_result_txt += "<br />";
 				m_result_txt += "Sell:<br />";
-				m_result_txt += "Shares: ";
+				m_result_txt += "Stock: ";
 				m_result_txt += Double.toString(total_sell_price);
 				m_result_txt += "<br />";
 				m_result_txt += "Fee: ";
@@ -351,7 +351,7 @@ public class ActivityStockBuySell extends Activity {
     	edit_sellprice.setText(Double.toString(m_sell_price));
     	edit_others.setText(Double.toString(m_other_charges));
     	edit_lotsize.setText(Integer.toString(m_lot_size));
-    	edit_volume.setText(Integer.toString(m_total_shares));
+    	edit_volume.setText(Integer.toString(m_total_stocks));
     	textview_result.setText(android.text.Html.fromHtml(m_result_txt));
     }
     

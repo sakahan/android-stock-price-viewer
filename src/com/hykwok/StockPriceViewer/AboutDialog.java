@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin and Jonathan Gonzalez (jonathan@jonbaraq.eu)
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -30,16 +30,19 @@ public class AboutDialog extends Dialog implements OnClickListener {
 	// about messages
 	private static final String str_about[] = {
 			"<b>Stock Price Viewer</b>",
-			"Copyright 2010 - 2011 Kwok Ho Yin",
+			"Copyright 2010 - 2011 Kwok Ho Yin and Jonathan Gonzalez",
 			"Licensed under the Apache License, Version 2.0",
 			"",
 			"Credits:",
 			"Application icon source:",
-			"IconEden Free Icons. Available at http://www.iconeden.com/",
-			"",
-			"History:",
-			"0.1	Initial release"
+			"IconEden Free Icons. Available at http://www.iconeden.com/"
 	};
+
+    private static final String str_history[] = {
+        "0.3",  "Show chart (Jonathan Gonzalez),UI modification and bug fix",
+		"0.2",  "Add stock detail view and bug fix",
+		"0.1",  "Initial release"
+    };
 
 	public AboutDialog(Context context) {
 		super(context);
@@ -59,6 +62,11 @@ public class AboutDialog extends Dialog implements OnClickListener {
     	String html_about = "";
     	for(int i=0; i<str_about.length; i++) {
     		html_about = html_about + str_about[i] + "<br />";
+    	}
+        // show history
+        html_about = html_about + "<br />History:<br /><br />";
+        for(int i=0; i<str_history.length/2; i++) {
+    		html_about = html_about + str_history[i*2] + "<br />" + str_history[i*2+1] + "<br /><br />";
     	}
 
     	about_text.setText(android.text.Html.fromHtml(html_about));

@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin and Jonathan Gonzalez (jonathan@jonbaraq.eu)
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 public class StockDataProvider_Yahoo {
@@ -35,6 +38,7 @@ public class StockDataProvider_Yahoo {
 	private static final String[] mRegions = { "HK", "US" };
 
 	// format URL path (refer to http://www.gummy-stuff.org/Yahoo-data.htm for more information)
+	// refer to: PAPAYA, "Stock quote and chart from Yahoo in C#", The Code Project
 	private static final String[] szURL_Server = { "http://hk.finance.yahoo.com", "http://download.finance.yahoo.com" };
 	
 	private static int m_selected_region = 0;
@@ -54,6 +58,11 @@ public class StockDataProvider_Yahoo {
 														 "h",  "j",  "k",  "m3", "m4",
 														 "r",  "n" };
 	
+	// chart options
+	public final int YAHOO_CHART_OPT_1_DAY = 0;
+	public final int YAHOO_CHART_OPT_5_DAY = 1;
+	public final int YAHOO_CHART_OPT_1_YEAR = 2;
+	
 	public void selectRegion(String region) {
 		for(int i=0; i<mRegions.length; i++) {
 			if(mRegions[i].contentEquals(region)) {
@@ -71,7 +80,7 @@ public class StockDataProvider_Yahoo {
 			szURL += x;
 		}
 
-		Log.d(TAG, "URL=" + szURL);
+		Log.d(TAG, "Data URL=" + szURL);
 
 		try {
 			URL url = new URL(szURL);
@@ -175,7 +184,7 @@ public class StockDataProvider_Yahoo {
 				szURL += x;
 			}
 
-			Log.d(TAG, "URL=" + szURL);
+			Log.d(TAG, "Data URL=" + szURL);
 
 			URL url = new URL(szURL);
 			InputStream stream = url.openStream();
@@ -226,6 +235,40 @@ public class StockDataProvider_Yahoo {
 		}
 
 		return false;
+	}
+	
+	public Bitmap startGetImageFromYahoo(String symbol, int option) {
+		String	url;
+		
+		switch (option) {
+		case YAHOO_CHART_OPT_1_DAY:
+			url = "http://ichart.yahoo.com/t?s=" + symbol;
+			break;
+			
+		case YAHOO_CHART_OPT_5_DAY:
+			url = "http://ichart.yahoo.com/v?s=" + symbol;
+			break;
+			
+		case YAHOO_CHART_OPT_1_YEAR:
+			url = "http://ichart.finance.yahoo.com/c/bb/m/" + symbol;
+			break;
+			
+		default:
+			return null;
+		}
+		
+		Log.d(TAG, "Chart URL=" + url);
+		  
+		try {
+			URL chartUrl = new URL(url);
+			InputStream is = chartUrl.openStream();
+			BitmapDrawable d = (BitmapDrawable) BitmapDrawable.createFromStream(is, "src name");
+			Log.d(TAG, "Chart is downloaded");
+			return d.getBitmap();
+		} catch (Exception e) {
+		    Log.d(TAG, "Exception = "+e.getMessage());
+		    return null;
+		}
 	}
 
 	public int getStockDataCount() {

@@ -16,6 +16,8 @@
 
 package com.hykwok.StockPriceViewer;
 
+//Refer to the section "Avoid Internal Getters/Setters" of 
+//the article "Designing for Performance" (available in Android Development Document)
 public class StockDetailData {
 	public String symbol;
 	public double last_trade_price;
