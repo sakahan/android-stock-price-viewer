@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -67,43 +67,46 @@ public class ActivityMain extends Activity {
 	private static final String BROADCAST_KEY_LASTUPDATETIME = "lastupdatetime";
 	private static final String BROADCAST_KEY_TYPE = "type";
 	private static final String BROADCAST_KEY_SYMBOL = "symbol";
+	private static final String BROADCAST_KEY_REGION = "region";
 	private static final String BROADCAST_KEY_UPDATETIME = "update_interval";
 
 	private static final int STOCKDATA_ADD_NEW = 1;
     private static final int STOCKDATA_CONFUPDATED = 2;
     private static final int STOCKDATA_NEWDATA_UPD = 3;
-    private static final int STOCKDATA_NODATA_UPD = 4;
+    private static final int STOCKDATA_NEWALLDATA_UPD = 4;
+    private static final int STOCKDATA_NODATA_UPD = 5;
 
     private static final int MENU_ABOUT = Menu.FIRST;
 	private static final int MENU_PREFERENCE = Menu.FIRST + 1;
 
 	private static final int DIALOG_DELETE_SYMBOL = 1;
 	private static final int DIALOG_ABOUT = 2;
+	private static final int DIALOG_ADD_SYMBOL = 3;
 
 	// Preference keys
 	private static final String KEY_ROAMING_OPT = "roaming_option";
 	private static final String KEY_UPDATE_INTERVAL = "update_interval";
 	private static final String KEY_LASTUPDATETIME = "last_update_time";
 	private static final String KEY_BKUPDATE = "background_update";
+	private static final String KEY_REGIONSELECTION = "region_selection";
 
 	// backup keys
-	private static final String KEY_BK_EDITTEXT = "backup_edittext";
-
+	
 	// Message ID
 	private static final int GUI_UPDATE_LISTVIEW = 0x100;
 	private static final int GUI_UPDATE_LISTVIEW_FAIL = 0x101;
 
-	// controls
-	private EditText 		m_edittext_symbol;
-	private TextView 		m_textview_updatetime;
-	private Spinner			m_spinner_region;
+	// controls	
+	private TextView 		m_textview_updatetime;	
 	private Button			m_btn_add;
 	private ListView		m_listview_stocks;
 	private ProgressDialog	m_progress_dialog = null;
+	private Dialog			m_addsymbol_dialog = null;
 
 	// region list
 	private ArrayList<String> allregions = null;
 	private ArrayAdapter<String> region_adapter = null;
+	private int m_region_selection = 0;
 
 	// list
 	private StockPriceListAdapter	mStockPricelistAdapter;
@@ -123,7 +126,6 @@ public class ActivityMain extends Activity {
 
 	// variables
 	private String					m_selected_symbol = "";
-	private String					m_SavedInstanceText = "";
 	private boolean                 m_service_started = false;
 
     /** Called when the activity is first created. */
@@ -136,9 +138,7 @@ public class ActivityMain extends Activity {
 
         try {
         	// get controls
-        	m_edittext_symbol = (EditText)findViewById(R.id.EditTextSymbol);
         	m_textview_updatetime = (TextView)findViewById(R.id.TextViewLastUpdate);
-        	m_spinner_region = (Spinner)findViewById(R.id.SpinnerRegion);
         	m_btn_add = (Button)findViewById(R.id.ButtonAdd);
         	m_listview_stocks = (ListView)findViewById(R.id.ListViewStock);
 
@@ -165,6 +165,11 @@ public class ActivityMain extends Activity {
 	        	updateflag = true;
 	        }
 	        
+	        if(mPrefs.contains(KEY_REGIONSELECTION) == false) {
+	        	editor.putInt(KEY_REGIONSELECTION, 0);
+	        	updateflag = true;
+	        }
+	        
 	        if(updateflag) {
 	        	editor.commit();
 	        }
@@ -175,20 +180,10 @@ public class ActivityMain extends Activity {
         		allregions.add(StockData_DB.mRegions[i]);
         	}
 
-        	if(savedInstanceState != null) {
-	        	// just restore edit text box firstly
-	        	String text_symbol = savedInstanceState.getString(KEY_BK_EDITTEXT);
-
-	        	Log.d(TAG, "text_symbol=" + text_symbol);
-
-	        	m_SavedInstanceText = text_symbol;
-	        	m_edittext_symbol.setText(text_symbol);
-	        }
+        	//if(savedInstanceState != null) {
+	        //}
 
         	// set listeners
-        	m_edittext_symbol.setSingleLine();
-        	m_edittext_symbol.setOnFocusChangeListener(focusListener_Symbol);
-
         	m_btn_add.setOnClickListener(clickListener_btnadd);
 
         	m_listview_stocks.setOnItemLongClickListener(longclickListener_listview);
@@ -198,7 +193,6 @@ public class ActivityMain extends Activity {
 
         	region_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, allregions);
         	region_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	m_spinner_region.setAdapter(region_adapter);
 
         	// register broadcast receiver
         	IntentFilter filter = new IntentFilter(SERVICE_TO_ACTIVITY_BROADCAST);
@@ -226,6 +220,7 @@ public class ActivityMain extends Activity {
     		String szupdatetime = mPrefs.getString(KEY_UPDATE_INTERVAL, "15");
     		m_updateinterval = Long.parseLong(szupdatetime);
     		m_enablebkupdate = mPrefs.getBoolean(KEY_BKUPDATE, true);
+    		m_region_selection = mPrefs.getInt(KEY_REGIONSELECTION, 0);
 
     		String sztime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(new Date(m_lastupdatetime));
     		m_textview_updatetime.setText(sztime);
@@ -325,13 +320,6 @@ public class ActivityMain extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
     	Log.d(TAG, "onSaveInstanceState >>>>>");
 
-    	// backup current textview content
-    	String txt_symbol = m_edittext_symbol.getText().toString();
-
-    	Log.d(TAG, "txt_symbol=" + txt_symbol);
-
-    	outState.putString(KEY_BK_EDITTEXT, txt_symbol);
-
     	Log.d(TAG, "onSaveInstanceState <<<<<");
     }
 
@@ -382,6 +370,10 @@ public class ActivityMain extends Activity {
 
     		case DIALOG_ABOUT:
     			return new AboutDialog(this);
+    			
+    		case DIALOG_ADD_SYMBOL:
+    			dialog = createAddSymbolDialog(this);
+    			return dialog; 
 
     		default:
     			break;
@@ -398,43 +390,23 @@ public class ActivityMain extends Activity {
     			String title = "Symbol: " + m_selected_symbol;
     			dialog.setTitle(title);
     			break;
+    			
+    		case DIALOG_ADD_SYMBOL:
+    			EditText edittext_symbol = (EditText)dialog.findViewById(R.id.EditText_AddSymSymbol);
+    			Spinner spinner_region = (Spinner)dialog.findViewById(R.id.Spinner_AddSymRegion);
+    			
+    			edittext_symbol.setSingleLine();
+    			edittext_symbol.setText("");
+    			spinner_region.setAdapter(region_adapter);
+    			spinner_region.setSelection(m_region_selection);
+    			m_addsymbol_dialog = dialog;
+    			break;
 
     		default:
     			break;
     	}
     }
-
-    // EditText control
-    private OnFocusChangeListener focusListener_Symbol = new OnFocusChangeListener() {
-    	int	len;
-    	String	m_current_input_value = "";
-
-		@Override
-		public void onFocusChange(View v, boolean hasFocus) {
-			m_current_input_value = m_edittext_symbol.getText().toString();
-
-			if(hasFocus) {
-				Log.d(TAG, "m_edittext_symbol EditText on focus. text=" + m_current_input_value);
-				len = m_current_input_value.length();
-				if(len > 0) {
-					if(m_current_input_value.compareTo(m_SavedInstanceText) == 0) {
-						m_SavedInstanceText = "";
-						// move the cursor to the end of the text
-						m_edittext_symbol.setSelection(len);
-					} else {
-						m_current_input_value = "";
-						m_edittext_symbol.setText(m_current_input_value);
-					}
-				}
-			} else {
-				Log.d(TAG, "m_edittext_symbol EditText loss focus. text=" + m_current_input_value);
-				if(m_current_input_value.length() == 0) {
-					m_edittext_symbol.setText("");
-				}
-			}
-		}
-    };
-
+    
     // ListView control
     private OnItemLongClickListener longclickListener_listview = new OnItemLongClickListener() {
 
@@ -465,29 +437,21 @@ public class ActivityMain extends Activity {
 
 		@Override
 		public void onClick(View view) {
-			String input_symbol = ConvertToSymbol(m_edittext_symbol.getText().toString());
-
-			if(input_symbol.contentEquals("") == false) {
-				if(m_DB.IsSymbolExist(input_symbol) == false) {
-					Log.d(TAG, "Input symbol=" + input_symbol);
-					sendSettingToService(STOCKDATA_ADD_NEW, input_symbol);
-
-					final CharSequence title = getString(R.string.Dialog_Progress_Title);
-					final CharSequence message = getString(R.string.Dialog_Progress_Message);
-
-					m_progress_dialog = ProgressDialog.show(ActivityMain.this, title, message, true);
-				}
-			}
+			showDialog(DIALOG_ADD_SYMBOL);
 		}
     };
 
-    private String ConvertToSymbol(String value) {
-    	String szregion = "";
+    private String ConvertToSymbol(String symbol, String region) {    	
     	String result = "";
 
     	try {
-    		szregion = StockData_DB.mRegions[m_spinner_region.getSelectedItemPosition()];
-    		result = String.format("%04d.%s", Integer.parseInt(value), szregion);
+    		if(region.contentEquals("HK")) {
+    			// For Hong Kong securities, the symbol format is xxxx.hk.
+    			// For example, HSBC is 0005.HK
+    			result = String.format("%04d.HK", Integer.parseInt(symbol));
+    		} else {
+    			result = symbol;
+    		}
     	} catch (Exception e) {
     		Log.e(TAG, "ConvertToSymbol:" + e.toString());
     	}
@@ -526,9 +490,69 @@ public class ActivityMain extends Activity {
 
     	return builder.create();
     }
+    
+    // create add symbol dialog box
+    private Dialog createAddSymbolDialog(Context context) {
+    	Log.d(TAG, "----- createAddSymbolDialog -----");
+
+    	AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    	
+    	LayoutInflater inflater = LayoutInflater.from(context);
+    	final View addsymbolView = inflater.inflate(R.layout.addsymbol_dialog, null);
+    	builder.setView(addsymbolView);
+    	builder.setTitle(R.string.Dialog_Add_Symbol_Title);
+
+    	// OK button
+    	builder.setPositiveButton(context.getText(R.string.Dialog_Add_Symbol_OK),
+    	new DialogInterface.OnClickListener() {
+
+    		// handle OK button click
+			public void onClick(DialogInterface dialog, int which) {
+				EditText edittext_symbol = (EditText)m_addsymbol_dialog.findViewById(R.id.EditText_AddSymSymbol);
+    			Spinner spinner_region = (Spinner)m_addsymbol_dialog.findViewById(R.id.Spinner_AddSymRegion);
+    			
+    			m_region_selection = spinner_region.getSelectedItemPosition();
+    			
+    			String region = StockData_DB.mRegions[m_region_selection];
+				String input_symbol = ConvertToSymbol(edittext_symbol.getText().toString(), region);				
+				
+				// save selected region
+				SharedPreferences.Editor editor = mPrefs.edit();		        
+	        	editor.putInt(KEY_REGIONSELECTION, m_region_selection);
+	        	editor.commit();
+
+				if(input_symbol.contentEquals("") == false) {
+					if(m_DB.IsSymbolExist(input_symbol) == false) {
+						Log.d(TAG, "Input symbol=" + input_symbol);
+						sendSettingToService(STOCKDATA_ADD_NEW, input_symbol, region);
+
+						final CharSequence title = getString(R.string.Dialog_Progress_Title);
+						final CharSequence message = getString(R.string.Dialog_Progress_Message);
+
+						m_progress_dialog = ProgressDialog.show(ActivityMain.this, title, message, true);
+					}
+				}
+			}
+    	});
+
+    	// Cancel button
+    	builder.setNegativeButton(context.getText(R.string.Dialog_Add_Symbol_Cancel),
+    	new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				Spinner spinner_region = (Spinner)m_addsymbol_dialog.findViewById(R.id.Spinner_AddSymRegion);
+    			m_region_selection = spinner_region.getSelectedItemPosition();
+    			// save selected region
+				SharedPreferences.Editor editor = mPrefs.edit();		        
+	        	editor.putInt(KEY_REGIONSELECTION, m_region_selection);
+	        	editor.commit();
+			}
+    	});
+
+    	return builder.create();
+    }
 
     // send data to service
-    void sendSettingToService(final int type, final String symbol) {
+    void sendSettingToService(final int type, final String symbol, final String region) {
     	long delaytime = 10;
     	
     	// has to start service to get data
@@ -557,6 +581,7 @@ public class ActivityMain extends Activity {
 	     		switch(type) {
 	     		case STOCKDATA_ADD_NEW:
 	     			intent.putExtra(BROADCAST_KEY_SYMBOL, symbol);
+	     			intent.putExtra(BROADCAST_KEY_REGION, region);
 	     			break;
 
 	     		case STOCKDATA_CONFUPDATED:
@@ -585,10 +610,12 @@ public class ActivityMain extends Activity {
 
 				switch(type) {
 				case STOCKDATA_NEWDATA_UPD:
+				case STOCKDATA_NEWALLDATA_UPD:
 					m_lastupdatetime = intent.getExtras().getLong(BROADCAST_KEY_LASTUPDATETIME, 0);
 
 					// send message to activity
-	    			ActivityMain.this.objHandler.sendEmptyMessage(GUI_UPDATE_LISTVIEW);
+					Message msg = Message.obtain(ActivityMain.this.objHandler, GUI_UPDATE_LISTVIEW, type, 0);
+	    			ActivityMain.this.objHandler.sendMessage(msg);
 					break;
 
 				case STOCKDATA_NODATA_UPD:
@@ -626,15 +653,17 @@ public class ActivityMain extends Activity {
 					m_textview_updatetime.setText(sztime);
 
 					if(m_progress_dialog != null) {
-	    				Toast.makeText(ActivityMain.this, R.string.Toast_Add_Symbol_Ok, Toast.LENGTH_LONG).show();
-	    				m_edittext_symbol.setText("");
+						if(msg.arg1 == STOCKDATA_NEWDATA_UPD) {
+							Toast.makeText(ActivityMain.this, R.string.Toast_Add_Symbol_Ok, Toast.LENGTH_LONG).show();
+						} else {
+							Toast.makeText(ActivityMain.this, R.string.Toast_Add_Symbol_Fail, Toast.LENGTH_LONG).show();
+						}
 					}
     				break;
 
     			case GUI_UPDATE_LISTVIEW_FAIL:
     				if(m_progress_dialog != null) {
 	    				Toast.makeText(ActivityMain.this, R.string.Toast_Add_Symbol_Fail, Toast.LENGTH_LONG).show();
-	    				m_edittext_symbol.setText("");
 					}
     				break;
     		}

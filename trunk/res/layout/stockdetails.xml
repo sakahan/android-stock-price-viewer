@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin and Jonathan Gonzalez (jonathan@jonbaraq.eu)
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -346,6 +346,36 @@ android:layout_marginRight="5dip"
 >
 </TextView>
 </LinearLayout>
+<!-- Line 13 -->
+<LinearLayout
+android:id="@+id/LinearLayout_Line12"
+android:layout_width="fill_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:layout_marginTop="20dip"
+>
+<TextView
+android:id="@+id/TextView_ChartOption"
+android:layout_height="wrap_content"
+android:layout_width="wrap_content"
+android:text="@string/detail_chart_type"
+android:layout_marginRight="5dip"
+>
+</TextView>
+<Spinner 
+android:id="@+id/Spinner_ChartTime" 
+android:layout_width="wrap_content" 
+android:layout_height="40dip"
+>
+</Spinner>
+</LinearLayout>
+<ImageView 
+android:id="@+id/ImageView_Chart" 
+android:layout_width="480dip" 
+android:layout_height="150dip"
+android:layout_gravity="center"
+>
+</ImageView>
 
 <Button
 android:text="@string/detail_buysell"

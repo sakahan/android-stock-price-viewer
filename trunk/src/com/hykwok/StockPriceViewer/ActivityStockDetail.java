@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin and and Jonathan Gonzalez (jonathan@jonbaraq.eu)
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,8 +29,13 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class ActivityStockDetail extends Activity {
 	// debug tag for LogCat
@@ -62,6 +69,7 @@ public class ActivityStockDetail extends Activity {
 	private static final String KEY_BK_TIME = "backup_time";
 	private static final String KEY_BK_PRICE = "backup_price";
 	private static final String KEY_BK_PE = "backup_pe";
+	private static final String KEY_BK_CHART = "backup_chart";
 	
 	private static final String KEY_CAL_SYMBOL = "cal_symbol";
     private static final String KEY_CAL_NAME = "cal_name";
@@ -80,9 +88,14 @@ public class ActivityStockDetail extends Activity {
 	private TextView			m_textview_52w_high, m_textview_52w_low;
 	private TextView			m_textview_50d_mov_avg, m_textview_200d_mov_avg;
 	private TextView			m_textview_pe;
+	private ImageView 			m_chart;
+	private Spinner 			m_timeSpinner;
 
 	private StockDetailData					m_stockdata = null;
 	private StockDataProvider_Yahoo			provider = null;
+	private Bitmap							m_stock_chart = null;
+	private Bitmap							m_red_cross = null;
+	private int								m_stock_chart_option = -1;
 
 	private boolean ref_roaming = false;
 	private StockDataConnection	m_connection;
@@ -129,13 +142,21 @@ public class ActivityStockDetail extends Activity {
         m_textview_50d_mov_avg = (TextView)findViewById(R.id.TextView_50DMovingAvg);
         m_textview_200d_mov_avg = (TextView)findViewById(R.id.TextView_200DMovingAvg);
         m_textview_pe = (TextView)findViewById(R.id.TextView_PE);
-
-        // set listeners
-        m_btn_buysell.setOnClickListener(clickListener_btnbuysell);
+        m_chart = (ImageView) findViewById(R.id.ImageView_Chart);
+        m_timeSpinner = (Spinner)  findViewById(R.id.Spinner_ChartTime);
+        
+        // load images
+        m_red_cross = BitmapFactory.decodeResource(this.getResources(), R.drawable.redcross);
+        
+        // setup spinner for the chart
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.time_range, android.R.layout.simple_spinner_item);
+    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	m_timeSpinner.setAdapter(adapter);
+    	m_timeSpinner.setEnabled(false);
 
         // thread for get data
         parser_thread = new Thread(mTask);
-
+        
         // get backup data
         if(savedInstanceState != null) {
         	Log.d(TAG, "Get backup data.....");
@@ -161,7 +182,20 @@ public class ActivityStockDetail extends Activity {
         	m_stockdata.open = savedInstanceState.getDouble(KEY_BK_OPEN);
         	m_stockdata.volume = savedInstanceState.getLong(KEY_BK_VOLUME);
         	m_stockdata.p_e_ratio = savedInstanceState.getString(KEY_BK_PE);
+        	m_stock_chart_option = savedInstanceState.getInt(KEY_BK_CHART);
         }
+        
+        final Object data = getLastNonConfigurationInstance();
+        
+        if(data != null) {
+        	// get backup chart image
+        	m_stock_chart = Bitmap.createBitmap((Bitmap) data);
+        	m_timeSpinner.setSelection(m_stock_chart_option);
+        }
+        
+        // set listeners
+        m_btn_buysell.setOnClickListener(clickListener_btnbuysell);
+        m_timeSpinner.setOnItemSelectedListener(itemselectedListener_timechart);
 
         Log.d(TAG, "onCreate <<<<<");
     }
@@ -250,11 +284,20 @@ public class ActivityStockDetail extends Activity {
 	    	outState.putString(KEY_BK_TIME, m_stockdata.last_trade_time);
 	    	outState.putDouble(KEY_BK_PRICE, m_stockdata.last_trade_price);
 	    	outState.putString(KEY_BK_PE, m_stockdata.p_e_ratio);
+	    	outState.putInt(KEY_BK_CHART, m_stock_chart_option);
     	}
 
     	Log.d(TAG, "onSaveInstanceState <<<<<");
     }    
     
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+    	// clone current chart so we don't have to download it 
+    	// again after the orientation is changed
+        final Bitmap backup_chart = Bitmap.createBitmap(m_stock_chart);
+        return backup_chart;
+    }
+
     // Button control
     private OnClickListener clickListener_btnbuysell = new OnClickListener() {
 
@@ -270,6 +313,56 @@ public class ActivityStockDetail extends Activity {
     		
     		startActivity(i);
 		}
+    };
+    
+    // Spinner control
+    private OnItemSelectedListener itemselectedListener_timechart = new OnItemSelectedListener() {
+    	public void onItemSelected (AdapterView<?> parent, View view, int position, long id) {
+    		int option = -1;
+    				
+    		switch(position) {
+    		case 0:
+    			option = provider.YAHOO_CHART_OPT_1_DAY;
+    			break;
+    			
+    		case 1:
+    			option = provider.YAHOO_CHART_OPT_5_DAY;
+    			break;
+    			
+    		case 2:
+    			option = provider.YAHOO_CHART_OPT_1_YEAR;
+    			break;
+    			
+    		default:
+    			return;
+    		}
+    		
+    		if(option != m_stock_chart_option) {
+    			m_stock_chart_option = option;
+	    		m_stock_chart = null;
+	    		
+	    		try {
+	    			if(parser_thread == null) {
+	    				parser_thread = new Thread(mTask);
+	    			}
+	    			
+	    			if(parser_thread.isAlive() == false) {
+						parser_thread.start();
+			
+						final CharSequence title = getString(R.string.Dialog_Progress_Title);
+						final CharSequence message = getString(R.string.Dialog_Progress_Message);
+						
+						m_progress_dialog = ProgressDialog.show(ActivityStockDetail.this, title, message, true);
+	    			}
+	    		} catch (Exception e) {
+	    			Log.d(TAG, "Start download chart error.");
+	    			e.printStackTrace();
+	    		}
+    		}
+    	}
+    	
+    	public void onNothingSelected (AdapterView<?> parent) {    		
+    	}
     };
 
     private void ShowData() {
@@ -308,6 +401,14 @@ public class ActivityStockDetail extends Activity {
 			m_textview_200d_mov_avg.setText("????");
 			m_textview_pe.setText("????");
 		}
+    	
+    	if(m_stock_chart != null) {
+    		m_chart.setImageBitmap(m_stock_chart);
+    		m_timeSpinner.setEnabled(true);
+    	} else {
+    		m_chart.setImageBitmap(m_red_cross);
+    		m_timeSpinner.setEnabled(false);
+    	}
     }
 
     private void UpdateData() {
@@ -327,13 +428,21 @@ public class ActivityStockDetail extends Activity {
 
 			m_given_symbol = symbol;
 			m_stockdata = null;
-
-			parser_thread.start();
-
-			final CharSequence title = getString(R.string.Dialog_Progress_Title);
-			final CharSequence message = getString(R.string.Dialog_Progress_Message);
-
-			m_progress_dialog = ProgressDialog.show(ActivityStockDetail.this, title, message, true);
+			
+			if(parser_thread == null) {
+				parser_thread = new Thread(mTask);
+			}
+			
+			if(parser_thread.isAlive() == false) {
+				parser_thread.start();
+	
+				final CharSequence title = getString(R.string.Dialog_Progress_Title);
+				final CharSequence message = getString(R.string.Dialog_Progress_Message);
+	
+				m_progress_dialog = ProgressDialog.show(ActivityStockDetail.this, title, message, true);
+			} else {
+				Log.d(TAG, "Parser thread is already started.");
+			}
 		}
 
 		ShowData();
@@ -352,6 +461,7 @@ public class ActivityStockDetail extends Activity {
     		if(m_progress_dialog != null) {
 				m_progress_dialog.dismiss();
 				m_progress_dialog = null;
+				parser_thread = null;
 			}
 
     		super.handleMessage(msg);
@@ -377,8 +487,10 @@ public class ActivityStockDetail extends Activity {
 
 			if(flag) {
 				m_stockdata = provider.startGetDetailDataFromYahoo(m_given_symbol);
+				m_stock_chart = provider.startGetImageFromYahoo(m_given_symbol, m_stock_chart_option);
 			} else {
 				m_stockdata = null;
+				m_stock_chart = null;
 			}
 
 			// send message to update display

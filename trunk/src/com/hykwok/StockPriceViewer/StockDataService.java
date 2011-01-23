@@ -43,12 +43,14 @@ public class StockDataService extends Service {
 	private static final String BROADCAST_KEY_LASTUPDATETIME = "lastupdatetime";
 	private static final String BROADCAST_KEY_TYPE = "type";
 	private static final String BROADCAST_KEY_SYMBOL = "symbol";
-	private static final String BROADCAST_KEY_UPDATETIME = "update_interval";
+	private static final String BROADCAST_KEY_REGION = "region";
+	private static final String BROADCAST_KEY_UPDATETIME = "update_interval";	
 
 	private static final int STOCKDATA_ADD_NEW = 1;
     private static final int STOCKDATA_CONFUPDATED = 2;
     private static final int STOCKDATA_NEWDATA_UPD = 3;
-    private static final int STOCKDATA_NODATA_UPD = 4;
+    private static final int STOCKDATA_NEWALLDATA_UPD = 4;
+    private static final int STOCKDATA_NODATA_UPD = 5;
 
     // Preference keys
 	private static final String KEY_ROAMING_OPT = "roaming_option";
@@ -59,6 +61,7 @@ public class StockDataService extends Service {
 	private StockDataProvider_Yahoo			provider = null;
 
 	private String							m_new_symbol = "";
+	private String							m_new_region = "";
 	private Cursor							db_alldata_result = null;
 
 	// broadcast receiver
@@ -131,10 +134,8 @@ public class StockDataService extends Service {
     	provider = new StockDataProvider_Yahoo();
 
     	// database
-    	m_DB = new StockData_DB(this);
-
-    	db_alldata_result = m_DB.GetAllData();
-
+    	connect_Database();
+    	
 		// register broadcast receiver
 		IntentFilter filter = new IntentFilter(ACTIVITY_TO_SERVICE_BROADCAST);
 		my_intent_receiver = new Broadcast_Receiver();
@@ -222,6 +223,9 @@ public class StockDataService extends Service {
 
 		public void run() {
 			do {
+				// pause the task
+				delay();
+				
 				// update
 				current_time = System.currentTimeMillis();
 				bConnectionFlag = true;
@@ -239,7 +243,10 @@ public class StockDataService extends Service {
 						Log.d(TAG, "Start connection: m_new_symbol="+m_new_symbol);
 						
 						if(m_new_symbol.equalsIgnoreCase("")) {
+							Log.d(TAG, "Update all symbols...");
+							
 							// update all symbols
+							connect_Database();
 							db_alldata_result.requery();
 
 							if(db_alldata_result.getCount() > 0) {
@@ -265,12 +272,13 @@ public class StockDataService extends Service {
 
 								if((cnt > 0) && (provider.startGetDataFromYahoo(symbol) == true)) {
 									total = provider.getStockDataCount();
+									connect_Database();
 
 									Log.d(TAG, "Total data has to be updated is " + total);
 
 									for(i=0; i<total; i++) {
 										stock_data = provider.getStockData(i);
-										m_DB.UpdateStockData(stock_data);
+										m_DB.UpdateStockPriceData(stock_data);
 									}
 
 									// update last update time
@@ -282,7 +290,7 @@ public class StockDataService extends Service {
 									}
 
 									// send data to activity to update view
-									sendSettingToActivity(STOCKDATA_NEWDATA_UPD);
+									sendSettingToActivity(STOCKDATA_NEWALLDATA_UPD);
 								} else {
 									sendSettingToActivity(STOCKDATA_NODATA_UPD);
 								}
@@ -297,12 +305,16 @@ public class StockDataService extends Service {
 								task_delay = max_task_delay;
 							}
 						} else {
+							Log.d(TAG, "Update the given symbols...");
+							
 							symbol = new String[1];
 							symbol[0] = m_new_symbol;
 							m_new_symbol = "";
 
 							if(provider.startGetDataFromYahoo(symbol) == true) {
 								stock_data = provider.getStockData(0);
+                                stock_data.region = m_new_region;
+								connect_Database();
 								m_DB.InsertStockData(stock_data);
 								sendSettingToActivity(STOCKDATA_NEWDATA_UPD);
 							} else {
@@ -318,16 +330,21 @@ public class StockDataService extends Service {
 						symbol = null;
 					} catch (Exception e) {
 						Log.e(TAG, "mTask: " + e.toString());
+						e.printStackTrace();
 						sendSettingToActivity(STOCKDATA_NODATA_UPD);
 					}
 				}
-
-				// call this task again
-				delay();
-
 			} while(parser_thread_alive);
 		}
 	};
+	
+	private void connect_Database() {
+		if(m_DB == null) {
+			m_DB = new StockData_DB(this);
+			db_alldata_result = null;
+	    	db_alldata_result = m_DB.GetAllData();
+		}
+	}
 
 	private boolean checkNeedUpdate(String symbol, long current_time) {
 		TimeZone	tz;
@@ -377,6 +394,7 @@ public class StockDataService extends Service {
 				switch(type) {
 				case STOCKDATA_ADD_NEW:
 					m_new_symbol = intent.getExtras().getString(BROADCAST_KEY_SYMBOL);
+					m_new_region = intent.getExtras().getString(BROADCAST_KEY_REGION);
 					
 					Log.d(TAG, "Broadcast_Receiver: m_new_symbol=" + m_new_symbol);
 					

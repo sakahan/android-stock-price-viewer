@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010, 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
 
 <resources>
     <string name="app_name">Stock Price Viewer</string>
-    <string name="btnAdd">Add</string>
+    <string name="btnAdd">Add New Stock</string>
     <string name="szLastUpdate">Last Update:</string>
     <string name="Dialog_Delete_Symbol_OK">OK</string>
     <string name="Dialog_Delete_Symbol_Cancel">Cancel</string>
-    <string name="Dialog_Delete_Symbol_Message">Delete this Symbol?</string>
+    <string name="Dialog_Delete_Symbol_Message">Delete this Stock?</string>
     <string name="Dialog_Progress_Title">Please wait...</string>
-    <string name="Dialog_Progress_Message">Try to get data from server.....</string>
-    <string name="Toast_Add_Symbol_Ok">The new symbol is added successfully</string>
-    <string name="Toast_Add_Symbol_Fail">Cannot get the new symbol information</string>
+    <string name="Dialog_Progress_Message">Retrieving data from server.....</string>
+    <string name="Toast_Add_Symbol_Ok">The new stock was added successfully</string>
+    <string name="Toast_Add_Symbol_Fail">Cannot get the new stock information</string>
     <string name="preferences_name">Preferences</string>
     <string name="szMenu_About">About</string>
 	<string name="szMenu_Preference">Setting</string>
@@ -50,9 +50,17 @@
 		
 	<string name="cal_buyprice">Price (Buy):</string>
 	<string name="cal_sellprice">Price (Sell):</string>
-	<string name="cal_totalshares">No. of shares:</string>
+	<string name="cal_totalstocks">No. of stocks:</string>
 	<string name="cal_others">Other charges:</string>
 	<string name="cal_lotsize">Lot Size:</string>
 	<string name="cal_btn_cal">Calculate</string>
-		
+	
+	<string name="Dialog_Add_Symbol_Title">Add New Stock</string>
+	<string name="Dialog_Add_Symbol_Symbol">Symbol:</string>
+	<string name="Dialog_Add_Symbol_Region">Region:</string>	
+	<string name="Dialog_Add_Symbol_OK">OK</string>
+    <string name="Dialog_Add_Symbol_Cancel">Cancel</string>
+    
+    <string name="detail_chart_type">Chart Type:</string>
+    
 </resources>

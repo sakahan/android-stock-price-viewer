@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -16,9 +16,21 @@
 
 package com.hykwok.StockPriceViewer;
 
+// Refer to the section "Avoid Internal Getters/Setters" of 
+// the article "Designing for Performance" (available in Android Development Document)
 public class StockData {
 	public String symbol;
 	public double price;
 	public double change;
 	public String name;
+    public String region;
+    public int    tag_id;
+
+    public static final String DEFAULT_REGION = "UNKNOWN";
+
+    public StockData() {
+        // set default values
+        region = DEFAULT_REGION;
+        tag_id = 1;	// the ID of the "default" should be 1 normally
+    }
 }

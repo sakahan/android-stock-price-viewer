@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ public class StockDataConnection {
 	public boolean IsWIFIAvailabe() {
 		try {
 			if(mWIFIMgr.isWifiEnabled()) {
+				// make sure current status is not "WIFI_STATE_ENABLING"
 				if(mWIFIMgr.getWifiState() == WifiManager.WIFI_STATE_ENABLED) {
 
 					WifiInfo info = mWIFIMgr.getConnectionInfo();
@@ -57,7 +58,7 @@ public class StockDataConnection {
 						Log.w(TAG, "No network is connected by WIFI");
 					}
 				} else {
-					Log.w(TAG, "WIFI state is not enabled");
+					Log.w(TAG, "WIFI state is not enabled successfully");
 				}
 			} else {
 				Log.w(TAG, "WIFI is not enabled");
