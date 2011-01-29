@@ -68,7 +68,7 @@ public class StockDataService extends Service {
 	private Broadcast_Receiver my_intent_receiver = null;
 
 	// task delay time (in ms)
-	private long task_delay = 60000;					// 1 min
+	private long task_delay = 5000;					// 5 seconds
 	private long user_task_delay = 900000;				// 15 min
 	private final long general_task_delay = 900000;		// 15 min
 	private final long max_task_delay = 86400000;		// 1 days
@@ -333,6 +333,9 @@ public class StockDataService extends Service {
 						e.printStackTrace();
 						sendSettingToActivity(STOCKDATA_NODATA_UPD);
 					}
+				} else {
+					// no connection, delay 1 min
+					task_delay = 60000;
 				}
 			} while(parser_thread_alive);
 		}
