@@ -294,8 +294,12 @@ public class ActivityStockDetail extends Activity {
     public Object onRetainNonConfigurationInstance() {
     	// clone current chart so we don't have to download it 
     	// again after the orientation is changed
-        final Bitmap backup_chart = Bitmap.createBitmap(m_stock_chart);
-        return backup_chart;
+    	if(m_stock_chart != null) {
+    		final Bitmap backup_chart = Bitmap.createBitmap(m_stock_chart);
+    		return backup_chart;
+    	} else {
+    		return null;
+    	}
     }
 
     // Button control
@@ -369,7 +373,11 @@ public class ActivityStockDetail extends Activity {
     	if(m_stockdata != null) {
 			// update display
 			m_textview_date.setText(m_stockdata.last_trade_date);
-			m_textview_time.setText(m_stockdata.last_trade_time);
+			if(m_stockdata.bFromBackupServer) {
+				m_textview_time.setText(m_stockdata.last_trade_time + " (EST)");
+			} else {
+				m_textview_time.setText(m_stockdata.last_trade_time);
+			}
 			m_textview_price.setText(Double.toString(m_stockdata.last_trade_price));
 			m_textview_change.setText(Double.toString(m_stockdata.change));
 			m_textview_change_percent.setText("(" + m_stockdata.change_percent + ")");
@@ -486,7 +494,11 @@ public class ActivityStockDetail extends Activity {
 			}
 
 			if(flag) {
-				m_stockdata = provider.startGetDetailDataFromYahoo(m_given_symbol);
+				m_stockdata = provider.startGetDetailDataFromYahoo(m_given_symbol, false);
+				if(m_stockdata == null) {
+					// use backup server
+					m_stockdata = provider.startGetDetailDataFromYahoo(m_given_symbol, true);
+				}
 				m_stock_chart = provider.startGetImageFromYahoo(m_given_symbol, m_stock_chart_option);
 			} else {
 				m_stockdata = null;

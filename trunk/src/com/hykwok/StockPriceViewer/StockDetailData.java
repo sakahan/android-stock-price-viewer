@@ -36,4 +36,5 @@ public class StockDetailData {
 	public double average_200_day_moving;
 	public String p_e_ratio;
 	public String name;
+	public boolean bFromBackupServer;
 }
