@@ -41,6 +41,10 @@ public class StockDataProvider_Yahoo {
 	// refer to: PAPAYA, "Stock quote and chart from Yahoo in C#", The Code Project
 	private static final String[] szURL_Server = { "http://hk.finance.yahoo.com", "http://download.finance.yahoo.com" };
 	
+	// backup server
+	// Note: In China, sometimes some server is blocked by the firewall so we might try to use this server for last try
+	private static final String szURL_Bakup_Server = "http://finance.yahoo.com";
+	
 	private static int m_selected_region = 0;
 	
 	private static final String szURL_Prefix = "/d/quotes.csv?s=";
@@ -72,9 +76,13 @@ public class StockDataProvider_Yahoo {
 		}
 	}
 
-	public StockDetailData startGetDetailDataFromYahoo(String symbols) {
-		String[]  decodestring = null;
+	public StockDetailData startGetDetailDataFromYahoo(String symbols, boolean use_backup_server) {
+		String[]  decodestring = null;		
 		String 	  szURL = szURL_Server[m_selected_region] + szURL_Prefix + symbols + "&f=";
+		
+		if(use_backup_server) {
+			szURL = szURL_Bakup_Server + szURL_Prefix + symbols + "&f=";
+		}
 
 		for(String x : yahoo_flags_detail) {
 			szURL += x;
@@ -142,6 +150,8 @@ public class StockDataProvider_Yahoo {
 		        			s_data.name = s_data.name.trim();
 		        			s_data.name = s_data.name.replace("'","''");
 		        		}
+		        		
+		        		s_data.bFromBackupServer = use_backup_server;
 		        	}
 		        } catch (Exception e) {
 		        	// just display error and handle next line
@@ -162,9 +172,13 @@ public class StockDataProvider_Yahoo {
 		return null;
 	}
 
-	public boolean startGetDataFromYahoo(String[] symbols) {
+	public boolean startGetDataFromYahoo(String[] symbols, boolean use_backup_server) {
 		String[]  decodestring = null;
 		String 	  szURL = szURL_Server[m_selected_region] + szURL_Prefix;
+		
+		if(use_backup_server) {
+			szURL = szURL_Bakup_Server + szURL_Prefix + symbols + "&f=";
+		}
 
 		try {
 			data.clear();

@@ -72,6 +72,7 @@ public class StockDataService extends Service {
 	private long user_task_delay = 900000;				// 15 min
 	private final long general_task_delay = 900000;		// 15 min
 	private final long max_task_delay = 86400000;		// 1 days
+	private long nFailConnectionCount = 0;
 
 	private long ref_time = 0;
 	private boolean ref_roaming = false;
@@ -210,7 +211,7 @@ public class StockDataService extends Service {
 		int			cnt, i, total;
 		long        current_time;
 		int			exception_cnt, normal_cnt;
-		boolean		bConnectionFlag;
+		boolean		bConnectionFlag, bUseBackupServer;
 
 		private void delay() {
 			try {
@@ -240,7 +241,7 @@ public class StockDataService extends Service {
 
 				if(bConnectionFlag) {
 					try {
-						Log.d(TAG, "Start connection: m_new_symbol="+m_new_symbol);
+						Log.d(TAG, "Start connection: m_new_symbol="+m_new_symbol+" m_new_region="+m_new_region);
 						
 						if(m_new_symbol.equalsIgnoreCase("")) {
 							Log.d(TAG, "Update all symbols...");
@@ -269,8 +270,14 @@ public class StockDataService extends Service {
 										exception_cnt++;
 									}
 								} while(db_alldata_result.moveToNext());
+								
+								if(nFailConnectionCount > 4) {
+									bUseBackupServer = true;
+								} else {
+									bUseBackupServer = false;
+								}
 
-								if((cnt > 0) && (provider.startGetDataFromYahoo(symbol) == true)) {
+								if((cnt > 0) && (provider.startGetDataFromYahoo(symbol, bUseBackupServer) == true)) {
 									total = provider.getStockDataCount();
 									connect_Database();
 
@@ -291,13 +298,24 @@ public class StockDataService extends Service {
 
 									// send data to activity to update view
 									sendSettingToActivity(STOCKDATA_NEWALLDATA_UPD);
+									nFailConnectionCount = 0;
 								} else {
 									sendSettingToActivity(STOCKDATA_NODATA_UPD);
+									
+									if(cnt > 0) {
+										// Cannot connect to the server
+										nFailConnectionCount++;
+									}
 								}
 
 								if(cnt == 0) {
 									Log.d(TAG, "No symbol has to be checked...");
 									task_delay = general_task_delay;
+								}
+								
+								if(nFailConnectionCount > 10) {
+									Log.d(TAG, "Too many fail connections...");
+									task_delay = general_task_delay * 2;
 								}
 							} else {
 								// no symbol
@@ -310,8 +328,16 @@ public class StockDataService extends Service {
 							symbol = new String[1];
 							symbol[0] = m_new_symbol;
 							m_new_symbol = "";
-
-							if(provider.startGetDataFromYahoo(symbol) == true) {
+							nFailConnectionCount = 0;
+							
+							if(provider.startGetDataFromYahoo(symbol, false) == false) {
+								// try to use backup server
+								if(provider.startGetDataFromYahoo(symbol, true) == false) {
+									nFailConnectionCount++;
+								}
+							}
+							
+							if(nFailConnectionCount == 0) {
 								stock_data = provider.getStockData(0);
                                 stock_data.region = m_new_region;
 								connect_Database();
@@ -399,7 +425,7 @@ public class StockDataService extends Service {
 					m_new_symbol = intent.getExtras().getString(BROADCAST_KEY_SYMBOL);
 					m_new_region = intent.getExtras().getString(BROADCAST_KEY_REGION);
 					
-					Log.d(TAG, "Broadcast_Receiver: m_new_symbol=" + m_new_symbol);
+					Log.d(TAG, "Broadcast_Receiver: m_new_symbol=" + m_new_symbol + " m_new_region=" + m_new_region);
 					
 					if(m_new_symbol.equalsIgnoreCase("")) {
 						Log.e(TAG, "Given symbol for ADD NEW is empty!");

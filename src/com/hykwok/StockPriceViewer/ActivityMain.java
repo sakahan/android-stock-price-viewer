@@ -517,13 +517,13 @@ public class ActivityMain extends Activity {
 				String input_symbol = ConvertToSymbol(edittext_symbol.getText().toString(), region);				
 				
 				// save selected region
-				SharedPreferences.Editor editor = mPrefs.edit();		        
+				SharedPreferences.Editor editor = mPrefs.edit();
 	        	editor.putInt(KEY_REGIONSELECTION, m_region_selection);
 	        	editor.commit();
 
 				if(input_symbol.contentEquals("") == false) {
 					if(m_DB.IsSymbolExist(input_symbol) == false) {
-						Log.d(TAG, "Input symbol=" + input_symbol);
+						Log.d(TAG, "Input symbol=" + input_symbol + " region=" + region);
 						sendSettingToService(STOCKDATA_ADD_NEW, input_symbol, region);
 
 						final CharSequence title = getString(R.string.Dialog_Progress_Title);
