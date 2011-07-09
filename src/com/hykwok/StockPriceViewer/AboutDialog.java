@@ -39,6 +39,7 @@ public class AboutDialog extends Dialog implements OnClickListener {
 	};
 
     private static final String str_history[] = {
+    	"0.4",  "Fix update bugs, add refresh and disable screen timeout functions",
         "0.3",  "Show chart (Jonathan Gonzalez),UI modification and bug fix",
 		"0.2",  "Add stock detail view and bug fix",
 		"0.1",  "Initial release"

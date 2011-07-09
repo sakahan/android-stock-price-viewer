@@ -75,9 +75,11 @@ public class ActivityMain extends Activity {
     private static final int STOCKDATA_NEWDATA_UPD = 3;
     private static final int STOCKDATA_NEWALLDATA_UPD = 4;
     private static final int STOCKDATA_NODATA_UPD = 5;
+    private static final int STOCKDATA_REFRESH = 6;
 
     private static final int MENU_ABOUT = Menu.FIRST;
 	private static final int MENU_PREFERENCE = Menu.FIRST + 1;
+	private static final int MENU_REFRESH = Menu.FIRST + 2;
 
 	private static final int DIALOG_DELETE_SYMBOL = 1;
 	private static final int DIALOG_ABOUT = 2;
@@ -89,6 +91,7 @@ public class ActivityMain extends Activity {
 	private static final String KEY_LASTUPDATETIME = "last_update_time";
 	private static final String KEY_BKUPDATE = "background_update";
 	private static final String KEY_REGIONSELECTION = "region_selection";
+	private static final String KEY_SCREENTIMEOUT_OPT = "screen_timeout_option";
 
 	// backup keys
 	
@@ -120,6 +123,7 @@ public class ActivityMain extends Activity {
 	private boolean					m_enableRoaming;
 	private long					m_updateinterval;
 	private boolean					m_enablebkupdate;
+	private boolean                 m_screentimeout;
 
 	// broadcast receiver
 	private BroadcastReceiver 		my_intent_receiver;
@@ -167,6 +171,11 @@ public class ActivityMain extends Activity {
 	        
 	        if(mPrefs.contains(KEY_REGIONSELECTION) == false) {
 	        	editor.putInt(KEY_REGIONSELECTION, 0);
+	        	updateflag = true;
+	        }
+	        
+	        if(mPrefs.contains(KEY_SCREENTIMEOUT_OPT) == false) {
+	        	editor.putBoolean(KEY_SCREENTIMEOUT_OPT, false);
 	        	updateflag = true;
 	        }
 	        
@@ -221,6 +230,7 @@ public class ActivityMain extends Activity {
     		m_updateinterval = Long.parseLong(szupdatetime);
     		m_enablebkupdate = mPrefs.getBoolean(KEY_BKUPDATE, true);
     		m_region_selection = mPrefs.getInt(KEY_REGIONSELECTION, 0);
+    		m_screentimeout = mPrefs.getBoolean(KEY_SCREENTIMEOUT_OPT, false);
 
     		String sztime = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(new Date(m_lastupdatetime));
     		m_textview_updatetime.setText(sztime);
@@ -235,6 +245,12 @@ public class ActivityMain extends Activity {
     		} else {
     			this.stopService(i);
     			m_service_started = false;
+    		}
+    		
+    		if(m_screentimeout) {
+    			m_listview_stocks.setKeepScreenOn(false);
+    		} else {
+    			m_listview_stocks.setKeepScreenOn(true);
     		}
     	} catch (Exception e) {
     		Log.e(TAG, "Error:" + e.toString());
@@ -331,8 +347,10 @@ public class ActivityMain extends Activity {
     	// create menu
     	menu_item = menu.add(0, MENU_PREFERENCE, 0, R.string.szMenu_Preference);
     	menu_item.setIcon(android.R.drawable.ic_menu_preferences);
-    	menu_item = menu.add(0, MENU_ABOUT, 1, R.string.szMenu_About);
-    	menu_item.setIcon(android.R.drawable.ic_menu_info_details);
+    	menu_item = menu.add(0, MENU_REFRESH, 1, R.string.szMenu_Refresh);
+    	menu_item.setIcon(android.R.drawable.ic_menu_rotate);
+    	menu_item = menu.add(0, MENU_ABOUT, 2, R.string.szMenu_About);
+    	menu_item.setIcon(android.R.drawable.ic_menu_info_details);    	
     	return true;
     }
 
@@ -348,6 +366,10 @@ public class ActivityMain extends Activity {
 	    		// launch CurrencyPreference activity
 	    		Intent i = new Intent(this, StockPricePreferences.class);
 	    		startActivity(i);
+	    		break;
+	    		
+	    	case MENU_REFRESH:
+	    		sendSettingToService(STOCKDATA_REFRESH, null, null);
 	    		break;
 
 	    	default:

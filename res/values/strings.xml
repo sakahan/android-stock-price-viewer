@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-	Copyright 2010, 2011 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -62,5 +62,7 @@
     <string name="Dialog_Add_Symbol_Cancel">Cancel</string>
     
     <string name="detail_chart_type">Chart Type:</string>
+    
+    <string name="szMenu_Refresh">Refresh</string>
     
 </resources>
