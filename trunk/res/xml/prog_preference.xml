@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -46,6 +46,14 @@ android:summaryOff="Disable background update during roaming"
 android:summaryOn="Enable background during roaming" 
 android:key="roaming_option" 
 android:title="Roaming"
+>
+</CheckBoxPreference>
+
+<CheckBoxPreference 
+android:summaryOff="Disable screen timeout " 
+android:summaryOn="Enable screen timeout" 
+android:key="screen_timeout_option" 
+android:title="Enable Screen Timeout"
 >
 </CheckBoxPreference>
 

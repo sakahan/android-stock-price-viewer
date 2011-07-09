@@ -1,5 +1,5 @@
 /*
-	Copyright 2010 Kwok Ho Yin
+	Copyright 2010 - 2011 Kwok Ho Yin
 
    	Licensed under the Apache License, Version 2.0 (the "License");
    	you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ public class StockDataService extends Service {
     private static final int STOCKDATA_NEWDATA_UPD = 3;
     private static final int STOCKDATA_NEWALLDATA_UPD = 4;
     private static final int STOCKDATA_NODATA_UPD = 5;
+    private static final int STOCKDATA_REFRESH = 6;
 
     // Preference keys
 	private static final String KEY_ROAMING_OPT = "roaming_option";
@@ -68,7 +69,7 @@ public class StockDataService extends Service {
 	private Broadcast_Receiver my_intent_receiver = null;
 
 	// task delay time (in ms)
-	private long task_delay = 5000;					// 5 seconds
+	private long task_delay = 5000;						// 5 seconds
 	private long user_task_delay = 900000;				// 15 min
 	private final long general_task_delay = 900000;		// 15 min
 	private final long max_task_delay = 86400000;		// 1 days
@@ -85,7 +86,7 @@ public class StockDataService extends Service {
 	private final IBinder mBinder = new LocalBinder();
 
 	private long  m_start_times = 0;
-	private boolean m_update_exception = true;
+	private boolean m_force_update = true;
 
 	private SharedPreferences		mPrefs;
 
@@ -210,7 +211,6 @@ public class StockDataService extends Service {
 		StockData	stock_data;
 		int			cnt, i, total;
 		long        current_time;
-		int			exception_cnt, normal_cnt;
 		boolean		bConnectionFlag, bUseBackupServer;
 
 		private void delay() {
@@ -255,67 +255,70 @@ public class StockDataService extends Service {
 
 								db_alldata_result.moveToFirst();
 
+								// total symbol that have to be updated
 								cnt = 0;
-								exception_cnt = 0;
-								normal_cnt = 0;
 
 								do {
 									db_symbol = db_alldata_result.getString(StockData_DB.COL_SD_SYMBOL_IDX);
 									if(checkNeedUpdate(db_symbol, current_time)) {
 										symbol[cnt++] = db_symbol;
-										normal_cnt++;
-										m_update_exception = true;
-									} else if(m_update_exception == true) {
+									} else if(m_force_update == true) {
 										symbol[cnt++] = db_symbol;
-										exception_cnt++;
 									}
 								} while(db_alldata_result.moveToNext());
 								
-								if(nFailConnectionCount > 4) {
-									bUseBackupServer = true;
-								} else {
-									bUseBackupServer = false;
-								}
-
-								if((cnt > 0) && (provider.startGetDataFromYahoo(symbol, bUseBackupServer) == true)) {
-									total = provider.getStockDataCount();
-									connect_Database();
-
-									Log.d(TAG, "Total data has to be updated is " + total);
-
-									for(i=0; i<total; i++) {
-										stock_data = provider.getStockData(i);
-										m_DB.UpdateStockPriceData(stock_data);
-									}
-
-									// update last update time
-									ref_time = current_time;
-									task_delay = user_task_delay;
-
-									if((normal_cnt == 0) && (exception_cnt > 0)) {
-										m_update_exception = false;
-									}
-
-									// send data to activity to update view
-									sendSettingToActivity(STOCKDATA_NEWALLDATA_UPD);
-									nFailConnectionCount = 0;
-								} else {
-									sendSettingToActivity(STOCKDATA_NODATA_UPD);
-									
-									if(cnt > 0) {
-										// Cannot connect to the server
-										nFailConnectionCount++;
-									}
-								}
-
 								if(cnt == 0) {
 									Log.d(TAG, "No symbol has to be checked...");
 									task_delay = general_task_delay;
-								}
-								
-								if(nFailConnectionCount > 10) {
-									Log.d(TAG, "Too many fail connections...");
-									task_delay = general_task_delay * 2;
+								} else {
+									// use another server if necessary
+									if(nFailConnectionCount > 4) {
+										bUseBackupServer = true;
+									} else {
+										bUseBackupServer = false;
+									}
+									
+									total = 0;
+									
+									if(provider.startGetDataFromYahoo(symbol, bUseBackupServer) == true) {
+										total = provider.getStockDataCount();
+									}
+									
+									Log.d(TAG, "Total data has to be updated is " + total);
+	
+									if(total > 0) {
+										connect_Database();
+										
+										for(i=0; i<total; i++) {
+											stock_data = provider.getStockData(i);
+											m_DB.UpdateStockPriceData(stock_data);
+										}
+										
+										// update last update time
+										ref_time = current_time;
+										
+										// update delay time
+										task_delay = user_task_delay;
+										
+										// disable "force" update flag
+										m_force_update = false;
+	
+										// send data to activity to update view
+										sendSettingToActivity(STOCKDATA_NEWALLDATA_UPD);
+										nFailConnectionCount = 0;
+									} else {
+										sendSettingToActivity(STOCKDATA_NODATA_UPD);
+										
+										if(cnt > 0) {
+											// Cannot connect to the server
+											nFailConnectionCount++;
+										}
+									}
+									
+									if(nFailConnectionCount > 10) {
+										Log.d(TAG, "Too many fail connections...");
+										task_delay = general_task_delay * 2;
+									}
 								}
 							} else {
 								// no symbol
@@ -438,6 +441,11 @@ public class StockDataService extends Service {
 				case STOCKDATA_CONFUPDATED:
 					ref_time = intent.getExtras().getLong(BROADCAST_KEY_LASTUPDATETIME);
 					ref_roaming = intent.getExtras().getBoolean(BROADCAST_KEY_ROAMING_OPT, false);
+					break;
+					
+				case STOCKDATA_REFRESH:
+					m_force_update = true;
+					parser_thread.interrupt();
 					break;
 
 				default:

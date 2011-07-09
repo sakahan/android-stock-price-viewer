@@ -177,7 +177,7 @@ public class StockDataProvider_Yahoo {
 		String 	  szURL = szURL_Server[m_selected_region] + szURL_Prefix;
 		
 		if(use_backup_server) {
-			szURL = szURL_Bakup_Server + szURL_Prefix + symbols + "&f=";
+			szURL = szURL_Bakup_Server + szURL_Prefix;
 		}
 
 		try {
